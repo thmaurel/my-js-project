@@ -1,33 +1,24 @@
-console.log("Hello from src/index.js!");
+import { Application } from "stimulus";
+import { definitionsFromContext } from "stimulus/webpack-helpers";
+import { fetchMovies } from './movies';
+import { initSortable } from './plugins/init_sortable';
 
-const list = document.querySelector('#movies');
+const application = Application.start();
+const context = require.context("./controllers", true, /\.js$/);
+application.load(definitionsFromContext(context));
 
-const fetchMovies = (input) => {
-  fetch(`http://www.omdbapi.com/?s=${input}&apikey=adf1f2d7`)
-    .then(response => response.json())
-    .then((data) => {
-      list.innerText = '';
-      data.Search.forEach((result) => {
-        list.insertAdjacentHTML('beforeend', `<li class="list-inline-item"><img src="${result.Poster}" alt=""><p>${result.Title}</p></li>`);
-      });
-    });
-};
+initSortable();
+
 const input = document.querySelector('#keyword');
 
 input.addEventListener('keyup', (event) => {
   fetchMovies(event.currentTarget.value);
 });
 
+fetchMovies('harry potter');
 
-// const searchAlgoliaPlaces = (event) => {
-//   fetch("https://places-dsn.algolia.net/1/places/query", {
-//     method: "POST",
-//     body: JSON.stringify({ query: event.currentTarget.value })
-//   })
-//     .then(response => response.json())
-//     .then((data) => {
-//       console.log(data.hits); // Look at local_names.default
-//     });
-// };
+const form = document.querySelector('#search-movies');
 
-// input.addEventListener("keyup", searchAlgoliaPlaces);
+form.addEventListener('submit', (event) => {
+  fetchMovies(input.value);
+});
